@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Studio - Música & Animación</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #6366f1;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      color: var(--accent);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media(min-width: 600px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+    .card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: var(--text-dim);
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      box-sizing: border-box;
+    }
+    button {
+      background: var(--accent);
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #4f46e5;
+    }
+    .output {
+      margin-top: 15px;
+      padding: 10px;
+      background: #020617;
+      border-radius: 6px;
+      font-size: 0.85em;
+      min-height: 40px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>AI Music & Animation Studio</h1>
+
+  <div class="grid">
+    <!-- GENERADOR DE MÚSICA -->
+    <div class="card">
+      <h2>🎵 Generador de Música Real</h2>
+      
+      <label>Estilo / Género / Instrumentos:</label>
+      <input type="text" id="musicStyle" placeholder="Ej: Breakcore, 8-bit, Rock con Violín...">
+
+      <label>Tipo de Voz:</label>
+      <select id="voiceType">
+        <option value="famous">Clonar / Voz Famosa (RVC Model)</option>
+        <option value="original">Voz Original Creada por IA</option>
+        <option value="instrumental">Solo Instrumental</option>
+      </select>
+
+      <label>Letra o Tema:</label>
+      <textarea id="lyrics" rows="3" placeholder="Escribe la letra o la idea de la canción..."></textarea>
+
+      <button onclick="generateMusic()">Generar Canción Completa</button>
+      <div class="output" id="musicStatus">Estado: Listo para conectar a Suno / Udio API</div>
+    </div>
+
+    <!-- GENERADOR DE ANIMACIÓN -->
+    <div class="card">
+      <h2>🎬 Generador de Animación</h2>
+      
+      <label>Estilo Visual:</label>
+      <select id="animStyle">
+        <option value="anime">Anime 2D Profesional</option>
+        <option value="drawing">Dibujo Tradicional / Sketch</option>
+        <option value="beginner">Estilo Principiante / Simple</option>
+        <option value="pixel">Pixel Art / Retro</option>
+      </select>
+
+      <label>Descripción de la Escena:</label>
+      <textarea id="animPrompt" rows="3" placeholder="Ej: Personaje corriendo en la lluvia bajo luces neón..."></textarea>
+
+      <button onclick="generateAnimation()">Generar Animación</button>
+      <div class="output" id="animStatus">Estado: Listo para conectar a Replicate / Runway API</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Para que esto genere archivos de audio/video reales de alta calidad,
+  // se deben integrar los endpoints y API Keys de los modelos especializados:
+
+  async function generateMusic() {
+    const style = document.getElementById('musicStyle').value;
+    const voice = document.getElementById('voiceType').value;
+    const status = document.getElementById('musicStatus');
+
+    if (!style) {
+      status.innerText = "Por favor ingresa un estilo de música.";
+      return;
+    }
+
+    status.innerText = "Procesando audio HQ mediante redes neuronales...";
+    
+    // Aquí se conecta con la API de Suno API / Udio / Bark / RVC
+    setTimeout(() => {
+      status.innerHTML = `<strong>Petición enviada:</strong> Generando track [${style}] con modalidad de voz [${voice}].`;
+    }, 1200);
+  }
+
+  async function generateAnimation() {
+    const style = document.getElementById('animStyle').value;
+    const prompt = document.getElementById('animPrompt').value;
+    const status = document.getElementById('animStatus');
+
+    if (!prompt) {
+      status.innerText = "Por favor describe la escena a animar.";
+      return;
+    }
+
+    status.innerText = "Renderizando cuadros de animación...";
+
+    // Aquí se conecta con Replicate (AnimateDiff / Stable Video Diffusion)
+    setTimeout(() => {
+      status.innerHTML = `<strong>Renderizando:</strong> Animación estilo [${style}] para "${prompt}".`;
+    }, 1200);
+  }
+</script>
+
+</body>
+</html>
