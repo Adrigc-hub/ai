@@ -1,29 +1,183 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Math Music Generator</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last Breath Animation - Pixel Style</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            color: #white;
+            font-family: monospace;
+        }
+        canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            background: #000;
+            box-shadow: 0 0 20px rgba(0, 0, 255, 0.2);
+        }
+    </style>
 </head>
 <body>
 
-  <main class="container">
-    <h1>Sintetizador Matemático</h1>
-    <p>Generación de melodías y secuencias ritmicas usando funciones matemáticas.</p>
+<canvas id="canvas" width="600" height="450"></canvas>
 
-    <div class="controls">
-      <select id="funcSelect">
-        <option value="fibonacci">1. Fibonacci Mod 4 (Arpegio)</option>
-        <option value="fifths">2. Círculo de Quintas (4n mod 7)</option>
-        <option value="pendulum">3. Pendulum Wave (Onda armónica)</option>
-      </select>
-      <button id="startBtn">▶ Iniciar / Pausar</button>
-    </div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
 
-    <canvas id="visualizer" width="600" height="250"></canvas>
-  </main>
+// Configuración de la animación por fases
+let state = 'HEART_BEAT'; // HEART_BEAT -> CRUSHING -> EXPLOSION -> GAMEOVER
+let timer = 0;
+let particles = [];
 
-  <script src="app.js"></script>
+// Clase para los pequeños cuadrados de píxeles
+class Pixel {
+    constructor(x, y, color, vx, vy) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.vx = vx;
+        this.vy = vy;
+        this.size = 4; // Tamaño del bloque cuadrado diminuto
+        this.alpha = 1;
+    }
+
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.2; // Gravedad ligera
+    }
+
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+    }
+}
+
+function initHeartExplosion() {
+    particles = [];
+    // Crear fragmentos en forma de pequeños cuadrados simulando el corazón azul rompiéndose
+    for (let i = 0; i < 150; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 8 + 2;
+        particles.push(new Pixel(
+            300 + (Math.random() * 40 - 20),
+            225 + (Math.random() * 40 - 20),
+            '#0000FF',
+            Math.cos(angle) * speed,
+            Math.sin(angle) * speed
+        ));
+    }
+}
+
+function drawPixelHeart(x, y, scale = 1, color = '#0000FF') {
+    ctx.fillStyle = color;
+    const p = 6 * scale;
+    // Matriz simplificada de un corazón pixel art
+    const heartMatrix = [
+        "0110110",
+        "1111111",
+        "1111111",
+        "0111110",
+        "0011100",
+        "0001000"
+    ];
+    
+    for (let row = 0; row < heartMatrix.length; row++) {
+        for (let col = 0; col < heartMatrix[row].length; col++) {
+            if (heartMatrix[row][col] === '1') {
+                ctx.fillRect(x + col * p, y + row * p, p, p);
+            }
+        }
+    }
+}
+
+function animate() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; // Efecto estela suave
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    timer++;
+
+    if (state === 'HEART_BEAT') {
+        // Fase 1: El corazón azul latiendo en el centro con un aura blanca[span_1](start_span)[span_1](end_span)
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(300, 225, 45 + Math.sin(timer * 0.2) * 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        drawPixelHeart(270, 195, 2, '#0000FF');
+
+        if (timer > 120) {
+            state = 'CRUSHING';
+            timer = 0;
+            initHeartExplosion();
+        }
+    } 
+    else if (state === 'CRUSHING') {
+        // Fase 2: Explosión de los bloques cuadrados del corazón[span_2](start_span)[span_2](end_span)
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        if (timer > 60) {
+            state = 'GAMEOVER';
+            timer = 0;
+        }
+    } 
+    else if (state === 'GAMEOVER') {
+        // Fase 3: Pantalla de GAME OVER y la silueta de Sans con los textos de Last Breath[span_3](start_span)[span_3](end_span)
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 48px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', 300, 100);
+
+        // Reflector de luz cenital central
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.beginPath();
+        ctx.moveTo(300, 120);
+        ctx.lineTo(150, 400);
+        ctx.lineTo(450, 400);
+        ctx.fill();
+
+        // Silueta pixelada de Sans simplificada
+        ctx.fillStyle = '#111';
+        ctx.fillRect(270, 250, 60, 100); // Cuerpo
+        ctx.fillStyle = '#FFF';
+        ctx.fillRect(285, 230, 30, 25);  // Cabeza
+
+        // Pequeños corazones rotos en el suelo
+        drawPixelHeart(280, 370, 0.5, '#0000FF');
+        drawPixelHeart(305, 375, 0.5, '#0000FF');
+        drawPixelHeart(295, 385, 0.5, '#0000FF');
+
+        // Texto de diálogo gradual estilo Last Breath
+        ctx.font = '16px monospace';
+        ctx.textAlign = 'left';
+        if (timer > 40) ctx.fillText('if you ever', 80, 260);[span_4](start_span)[span_4](end_span)
+        if (timer > 90) ctx.fillText('cared about', 80, 285);[span_5](start_span)[span_5](end_span)
+        if (timer > 140) ctx.fillText('someone', 80, 310);[span_6](start_span)[span_6](end_span)
+
+        if (timer > 190) {
+            ctx.textAlign = 'right';
+            ctx.fillText('you won\'t', 520, 260);[span_7](start_span)[span_7](end_span)
+            ctx.fillText('come back', 520, 285);[span_8](start_span)[span_8](end_span)
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
+// Iniciar bucle
+animate();
+</script>
+
 </body>
 </html>
